@@ -1,5 +1,6 @@
 import SwiftUI
 import AppTrackingTransparency
+import GoogleMobileAds
 
 @main
 struct MimiNenreiApp: App {
@@ -9,6 +10,9 @@ struct MimiNenreiApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    MobileAds.shared.start()
+                }
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active && !attRequested {
                         attRequested = true
