@@ -33,61 +33,33 @@ jobs:
 
       - name: Write App Store Connect key
         env:
-          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_API_KEY_CONTENT: ${{ secrets.ASC_API_KEY_CONTENT }}
         run: |
-          test -n "$ASC_PRIVATE_KEY"
-          mkdir -p /tmp/asc
+          test -n "$ASC_API_KEY_CONTENT"
           mkdir -p "$HOME/.appstoreconnect/private_keys"
-          printf '%s' "$ASC_PRIVATE_KEY" > "/tmp/asc/AuthKey_${ASC_KEY_ID}.p8"
-          cp "/tmp/asc/AuthKey_${ASC_KEY_ID}.p8" /tmp/asc_key.p8
-          cp "/tmp/asc/AuthKey_${ASC_KEY_ID}.p8" "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          if echo "$ASC_API_KEY_CONTENT" | grep -q "BEGIN PRIVATE KEY"; then
+            printf '%s' "$ASC_API_KEY_CONTENT" > "$HOME/.appstoreconnect/private_keys/AuthKey_WDXGY9WX55.p8"
+          else
+            echo "$ASC_API_KEY_CONTENT" | base64 -D > "$HOME/.appstoreconnect/private_keys/AuthKey_WDXGY9WX55.p8"
+          fi
+          cp "$HOME/.appstoreconnect/private_keys/AuthKey_WDXGY9WX55.p8" /tmp/asc_key.p8
 
       - name: Generate Xcode project
         run: xcodegen generate
 
       - name: Set build number
         run: |
-          BUILD_NUM=$((GITHUB_RUN_NUMBER + 100))
-          echo "BUILD_NUMBER=$BUILD_NUM" >> "$GITHUB_ENV"
-          echo "Using build number $BUILD_NUM"
+          BUILD_NUMBER=$((GITHUB_RUN_NUMBER + 100))
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+          echo "Using build number $BUILD_NUMBER"
 
       - name: Archive
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-          GAD_APPLICATION_IDENTIFIER: ${{ vars.GAD_APPLICATION_IDENTIFIER }}
-          GAD_BANNER_AD_UNIT_ID: ${{ vars.GAD_BANNER_AD_UNIT_ID }}
         run: |
-          xcodebuild archive \
-            -project MimiNenrei.xcodeproj \
-            -scheme MimiNenrei \
-            -configuration Release \
-            -destination "generic/platform=iOS" \
-            -archivePath build/MimiNenrei.xcarchive \
-            CODE_SIGN_STYLE=Automatic \
-            DEVELOPMENT_TEAM=83VGKGSQUH \
-            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-            GAD_APPLICATION_IDENTIFIER="${GAD_APPLICATION_IDENTIFIER:-ca-app-pub-3940256099942544~1458002511}" \
-            GAD_BANNER_AD_UNIT_ID="${GAD_BANNER_AD_UNIT_ID:-ca-app-pub-3940256099942544/2934735716}" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "/tmp/asc/AuthKey_${ASC_KEY_ID}.p8" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          xcodebuild archive             -project MimiNenrei.xcodeproj             -scheme MimiNenrei             -configuration Release             -destination "generic/platform=iOS"             -archivePath build/MimiNenrei.xcarchive             CODE_SIGN_STYLE=Automatic             DEVELOPMENT_TEAM=83VGKGSQUH             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"             GAD_APPLICATION_IDENTIFIER="ca-app-pub-9404799280370656~1401685923"             GAD_BANNER_AD_UNIT_ID="ca-app-pub-9404799280370656/9802920121"             -allowProvisioningUpdates             -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_WDXGY9WX55.p8"             -authenticationKeyID WDXGY9WX55             -authenticationKeyIssuerID 2be0734f-943a-4d61-9dc9-5d9045c46fec
 
       - name: Export IPA
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
-          xcodebuild -exportArchive \
-            -archivePath build/MimiNenrei.xcarchive \
-            -exportPath build/export \
-            -exportOptionsPlist export_options.plist \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "/tmp/asc/AuthKey_${ASC_KEY_ID}.p8" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          xcodebuild -exportArchive             -archivePath build/MimiNenrei.xcarchive             -exportPath build/export             -exportOptionsPlist export_options.plist             -allowProvisioningUpdates             -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_WDXGY9WX55.p8"             -authenticationKeyID WDXGY9WX55             -authenticationKeyIssuerID 2be0734f-943a-4d61-9dc9-5d9045c46fec
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
@@ -97,26 +69,17 @@ jobs:
           path: build/export/*.ipa
 
       - name: Upload to App Store Connect
-        env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           IPA_PATH="$(find build/export -name '*.ipa' -print -quit)"
           test -n "$IPA_PATH"
-          xcrun altool --upload-app \
-            --type ios \
-            --file "$IPA_PATH" \
-            --apiKey "$ASC_KEY_ID" \
-            --apiIssuer "$ASC_ISSUER_ID"
+          xcrun altool --upload-app             --type ios             --file "$IPA_PATH"             --apiKey WDXGY9WX55             --apiIssuer 2be0734f-943a-4d61-9dc9-5d9045c46fec
 
       - name: Submit production review
         env:
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_ID: WDXGY9WX55
+          ASC_ISSUER_ID: 2be0734f-943a-4d61-9dc9-5d9045c46fec
           ASC_P8_PATH: /tmp/asc_key.p8
           APP_BUNDLE_ID: com.tokyonasu.miminenrei
-          APP_NAME: "みみ年齢"
-          APP_SKU: miminenrei
           APP_VERSION: "1.0"
           BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
         run: |
