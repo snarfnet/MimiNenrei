@@ -5,11 +5,16 @@ options:
     iOS: "17.0"
   xcodeVersion: "16.0"
 
+packages:
+  GoogleMobileAds:
+    url: https://github.com/googleads/swift-package-manager-google-mobile-ads.git
+    from: 13.4.0
+
 settings:
   base:
     SWIFT_VERSION: "5.9"
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    CURRENT_PROJECT_VERSION: "2"
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: 83VGKGSQUH
 
@@ -20,6 +25,8 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - MimiNenrei
+    dependencies:
+      - package: GoogleMobileAds
     settings:
       base:
         PRODUCT_NAME: MimiNenrei
@@ -41,8 +48,8 @@ targets:
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UIUserInterfaceStyle: Light
-        GADApplicationIdentifier: "$(GAD_APPLICATION_IDENTIFIER)"
-        NSUserTrackingUsageDescription: "広告の最適化のため、トラッキングの許可をお願いしています。"
+        GADApplicationIdentifier: "ca-app-pub-9404799280370656~1401685923"
+        NSUserTrackingUsageDescription: "広告の最適化のため、トラッキングの許可をお願いします。"
         SKAdNetworkItems:
           - SKAdNetworkIdentifier: cstr6suwn9.skadnetwork
     scheme:

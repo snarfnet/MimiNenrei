@@ -34,7 +34,7 @@ jobs:
             -project MimiNenrei.xcodeproj \
             -scheme MimiNenrei \
             -configuration Debug \
-            -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
+            -destination "generic/platform=iOS Simulator" \
             CODE_SIGNING_ALLOWED=NO \
             GAD_APPLICATION_IDENTIFIER=ca-app-pub-3940256099942544~1458002511 \
             GAD_BANNER_AD_UNIT_ID=ca-app-pub-3940256099942544/2934735716
