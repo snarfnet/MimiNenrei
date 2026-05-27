@@ -1,0 +1,78 @@
+name: MimiNenrei Screenshots
+
+on:
+  workflow_dispatch:
+
+jobs:
+  screenshots:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          XCODE_APP=$(ls /Applications/ | grep "^Xcode_" | sort -V | tail -1)
+          if [ -n "$XCODE_APP" ]; then
+            sudo xcode-select -s "/Applications/$XCODE_APP"
+          fi
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build for simulator
+        run: |
+          xcodebuild build \
+            -project MimiNenrei.xcodeproj \
+            -scheme MimiNenrei \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,name=iPhone 16 Pro Max,OS=latest" \
+            CODE_SIGNING_ALLOWED=NO \
+            GAD_APPLICATION_IDENTIFIER=ca-app-pub-3940256099942544~1458002511 \
+            GAD_BANNER_AD_UNIT_ID=ca-app-pub-3940256099942544/2934735716 \
+            SYMROOT=build
+
+      - name: Boot simulator
+        run: |
+          UDID=$(xcrun simctl list devices available | grep "iPhone 16 Pro Max" | head -1 | sed 's/.*(\([A-Z0-9-]*\)).*/\1/')
+          echo "SIMULATOR_UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+
+      - name: Install app on simulator
+        run: |
+          APP_PATH=$(find build -name "MimiNenrei.app" -not -path "*/dSYM/*" | head -1)
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+          xcrun simctl install "$SIMULATOR_UDID" "$APP_PATH"
+
+      - name: Screenshot - Result screen
+        run: |
+          mkdir -p screenshots
+          xcrun simctl launch "$SIMULATOR_UDID" com.tokyonasu.miminenrei --args SCREENSHOT_MODE
+          sleep 5
+          xcrun simctl io "$SIMULATOR_UDID" screenshot screenshots/screenshot_result.png
+
+      - name: Terminate app
+        run: |
+          xcrun simctl terminate "$SIMULATOR_UDID" com.tokyonasu.miminenrei || true
+          sleep 1
+
+      - name: Screenshot - Home screen
+        run: |
+          xcrun simctl launch "$SIMULATOR_UDID" com.tokyonasu.miminenrei
+          sleep 4
+          xcrun simctl io "$SIMULATOR_UDID" screenshot screenshots/screenshot_home.png
+
+      - name: Terminate app
+        run: |
+          xcrun simctl terminate "$SIMULATOR_UDID" com.tokyonasu.miminenrei || true
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: MimiNenrei-Screenshots
+          path: screenshots/

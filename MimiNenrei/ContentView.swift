@@ -1,8 +1,19 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var screen: Screen = .home
-    @State private var test = HearingTest()
+    @State private var screen: Screen = MimiNenreiApp.isScreenshotMode ? .result : .home
+    @State private var test: HearingTest = {
+        let t = HearingTest()
+        if MimiNenreiApp.isScreenshotMode {
+            // Pre-populate: heard up to 15,000 Hz → ear age 35
+            t.results = [true, true, true, true, true, false, false, false]
+            t.maxHeard = 15000
+            t.currentIndex = 8
+            t.isFinished = true
+            t.earAge = 35
+        }
+        return t
+    }()
     @State private var sound = SoundGenerator()
 
     enum Screen {
