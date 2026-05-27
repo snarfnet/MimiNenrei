@@ -42,10 +42,9 @@ private struct BannerViewContainer: UIViewRepresentable {
 
 private extension UIApplication {
     var topViewController: UIViewController? {
-        connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first { $0.isKeyWindow }?
-            .rootViewController
+        guard let scene = connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
+            ?? connectedScenes.first as? UIWindowScene else { return nil }
+        return scene.keyWindow?.rootViewController
     }
 }
