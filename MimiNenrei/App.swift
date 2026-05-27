@@ -18,7 +18,7 @@ struct MimiNenreiApp: App {
                     Task { await MobileAds.shared.start() }
                 }
                 .onChange(of: scenePhase) { _, newPhase in
-                    if newPhase == .active && !attRequested {
+                    if newPhase == .active && !attRequested && !Self.isScreenshotMode {
                         attRequested = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             ATTrackingManager.requestTrackingAuthorization { _ in }
