@@ -117,7 +117,7 @@ jobs:
 
       - name: Archive
         run: |
-          xcodebuild archive             -project MimiNenrei.xcodeproj             -scheme MimiNenrei             -configuration Release             -destination "generic/platform=iOS"             -archivePath build/MimiNenrei.xcarchive             CODE_SIGN_STYLE=Manual             CODE_SIGN_IDENTITY="Apple Distribution"             DEVELOPMENT_TEAM=83VGKGSQUH             PROVISIONING_PROFILE_SPECIFIER="MimiNenrei AppStore"             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"             GAD_APPLICATION_IDENTIFIER="ca-app-pub-9404799280370656~1401685923"             GAD_BANNER_AD_UNIT_ID="ca-app-pub-9404799280370656/9802920121"             -allowProvisioningUpdates             -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_WDXGY9WX55.p8"             -authenticationKeyID WDXGY9WX55             -authenticationKeyIssuerID 2be0734f-943a-4d61-9dc9-5d9045c46fec
+          xcodebuild archive             -project MimiNenrei.xcodeproj             -scheme MimiNenrei             -configuration Release             -destination "generic/platform=iOS"             -archivePath build/MimiNenrei.xcarchive             CODE_SIGN_STYLE=Automatic             DEVELOPMENT_TEAM=83VGKGSQUH             CURRENT_PROJECT_VERSION="$BUILD_NUMBER"             GAD_APPLICATION_IDENTIFIER="ca-app-pub-9404799280370656~1401685923"             GAD_BANNER_AD_UNIT_ID="ca-app-pub-9404799280370656/9802920121"             -allowProvisioningUpdates             -authenticationKeyPath "$HOME/.appstoreconnect/private_keys/AuthKey_WDXGY9WX55.p8"             -authenticationKeyID WDXGY9WX55             -authenticationKeyIssuerID 2be0734f-943a-4d61-9dc9-5d9045c46fec
 
       - name: Export IPA
         run: |
