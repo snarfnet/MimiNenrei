@@ -55,39 +55,40 @@ private struct HomeView: View {
     let onStart: () -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
+        ScrollView {
+            VStack(spacing: 28) {
+                Spacer().frame(height: 40)
 
-            Image(systemName: "ear.and.waveform")
-                .font(.system(size: 78, weight: .semibold))
-                .foregroundStyle(.cyan)
-                .shadow(color: .cyan.opacity(0.7), radius: 24)
+                Image(systemName: "ear.and.waveform")
+                    .font(.system(size: 68, weight: .semibold))
+                    .foregroundStyle(.cyan)
+                    .shadow(color: .cyan.opacity(0.7), radius: 24)
 
-            VStack(spacing: 10) {
-                Text("みみ年齢")
-                    .font(.system(size: 46, weight: .black, design: .rounded))
-                Text("高い音がどこまで聞こえるかを測って、耳の目安年齢をチェックします。")
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.72))
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(5)
-            }
-            .foregroundStyle(.white)
-            .padding(.horizontal, 28)
-
-            Spacer()
-
-            GlassPanel {
-                VStack(spacing: 14) {
-                    InfoPill(icon: "headphones", text: "イヤホン推奨")
-                    InfoPill(icon: "speaker.wave.2", text: "音量は中くらい")
-                    InfoPill(icon: "moon.zzz", text: "静かな場所で測定")
+                VStack(spacing: 10) {
+                    Text("みみ年齢")
+                        .font(.system(size: 40, weight: .black, design: .rounded))
+                    Text("高い音がどこまで聞こえるかを測って、耳の目安年齢をチェックします。")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.72))
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(5)
                 }
-            }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 32)
 
-            BigButton(title: "テストを始める", icon: "play.fill", action: onStart)
-                .padding(.bottom, 34)
+                GlassPanel {
+                    VStack(spacing: 14) {
+                        InfoPill(icon: "headphones", text: "イヤホン推奨")
+                        InfoPill(icon: "speaker.wave.2", text: "音量は中くらい")
+                        InfoPill(icon: "moon.zzz", text: "静かな場所で測定")
+                    }
+                }
+
+                BigButton(title: "テストを始める", icon: "play.fill", action: onStart)
+                    .padding(.bottom, 40)
+            }
         }
+        .scrollBounceBehavior(.basedOnSize)
     }
 }
 
@@ -120,57 +121,58 @@ private struct TestView: View {
     let onFinish: () -> Void
 
     var body: some View {
-        VStack(spacing: 22) {
-            SectionTitle(icon: "waveform", title: "テスト中")
-                .padding(.top, 24)
+        ScrollView {
+            VStack(spacing: 24) {
+                SectionTitle(icon: "waveform", title: "テスト中")
+                    .padding(.top, 28)
 
-            ProgressView(value: test.progress)
-                .tint(.cyan)
-                .scaleEffect(y: 2.2)
-                .padding(.horizontal, 32)
+                ProgressView(value: test.progress)
+                    .tint(.cyan)
+                    .scaleEffect(y: 2.2)
+                    .padding(.horizontal, 32)
 
-            Text("\(test.currentIndex + 1) / \(test.steps.count)")
-                .font(.system(size: 15, weight: .bold, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.64))
+                Text("\(test.currentIndex + 1) / \(test.steps.count)")
+                    .font(.system(size: 15, weight: .bold, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.64))
 
-            Spacer()
+                if let step = test.currentStep {
+                    GlassPanel {
+                        VStack(spacing: 18) {
+                            Text(step.label)
+                                .font(.system(size: 42, weight: .black, design: .monospaced))
+                                .foregroundStyle(.cyan)
 
-            if let step = test.currentStep {
-                GlassPanel {
-                    VStack(spacing: 18) {
-                        Text(step.label)
-                            .font(.system(size: 46, weight: .black, design: .monospaced))
-                            .foregroundStyle(.cyan)
-
-                        Button {
-                            sound.play(frequency: step.frequency, duration: 2.5)
-                        } label: {
-                            Label(sound.isPlaying ? "再生中..." : "音を鳴らす", systemImage: sound.isPlaying ? "speaker.wave.3.fill" : "speaker.fill")
-                                .font(.system(size: 21, weight: .bold))
-                                .frame(maxWidth: .infinity, minHeight: 58)
-                                .background(sound.isPlaying ? Color.orange : Color.cyan, in: RoundedRectangle(cornerRadius: 16))
-                                .foregroundStyle(.black)
+                            Button {
+                                sound.play(frequency: step.frequency, duration: 2.5)
+                            } label: {
+                                Label(sound.isPlaying ? "再生中..." : "音を鳴らす", systemImage: sound.isPlaying ? "speaker.wave.3.fill" : "speaker.fill")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .frame(maxWidth: .infinity, minHeight: 54)
+                                    .background(sound.isPlaying ? Color.orange : Color.cyan, in: RoundedRectangle(cornerRadius: 16))
+                                    .foregroundStyle(.black)
+                            }
                         }
                     }
+
+                    Text("音は聞こえましたか？")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(.white)
+
+                    HStack(spacing: 14) {
+                        AnswerButton(title: "聞こえた", icon: "checkmark.circle.fill", color: .green) {
+                            answer(true)
+                        }
+                        AnswerButton(title: "聞こえない", icon: "xmark.circle.fill", color: .red) {
+                            answer(false)
+                        }
+                    }
+                    .padding(.horizontal, 22)
                 }
 
-                Text("音は聞こえましたか？")
-                    .font(.system(size: 21, weight: .bold))
-                    .foregroundStyle(.white)
-
-                HStack(spacing: 14) {
-                    AnswerButton(title: "聞こえた", icon: "checkmark.circle.fill", color: .green) {
-                        answer(true)
-                    }
-                    AnswerButton(title: "聞こえない", icon: "xmark.circle.fill", color: .red) {
-                        answer(false)
-                    }
-                }
-                .padding(.horizontal, 22)
+                Spacer().frame(height: 40)
             }
-
-            Spacer().frame(height: 34)
         }
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     private func answer(_ heard: Bool) {
