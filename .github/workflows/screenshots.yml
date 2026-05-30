@@ -30,7 +30,7 @@ jobs:
             -project MimiNenrei.xcodeproj \
             -scheme MimiNenrei \
             -configuration Debug \
-            -destination "platform=iOS Simulator,name=iPhone 16 Pro Max,OS=latest" \
+            -destination "platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest" \
             CODE_SIGNING_ALLOWED=NO \
             GAD_APPLICATION_IDENTIFIER=ca-app-pub-3940256099942544~1458002511 \
             GAD_BANNER_AD_UNIT_ID=ca-app-pub-3940256099942544/2934735716 \
@@ -38,7 +38,7 @@ jobs:
 
       - name: Boot simulator
         run: |
-          UDID=$(xcrun simctl list devices available | grep "iPhone 16 Pro Max" | head -1 | sed 's/.*(\([A-Z0-9-]*\)).*/\1/')
+          UDID=$(xcrun simctl list devices available | grep "iPhone 17 Pro Max" | head -1 | sed 's/.*(\([A-Z0-9-]*\)).*/\1/')
           echo "SIMULATOR_UDID=$UDID" >> "$GITHUB_ENV"
           xcrun simctl boot "$UDID" || true
           xcrun simctl bootstatus "$UDID" -b
