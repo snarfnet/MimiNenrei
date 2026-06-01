@@ -45,6 +45,6 @@ private extension UIApplication {
         guard let scene = connectedScenes
             .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
             ?? connectedScenes.first as? UIWindowScene else { return nil }
-        return scene.keyWindow?.rootViewController
+        return scene.windows.first(where: \.isKeyWindow)?.rootViewController
     }
 }
