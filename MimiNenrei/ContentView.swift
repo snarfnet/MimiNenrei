@@ -52,23 +52,26 @@ struct ContentView: View {
 }
 
 private struct HomeView: View {
+    @Environment(\.horizontalSizeClass) private var hSizeClass
     let onStart: () -> Void
+
+    private var isIPad: Bool { hSizeClass == .regular }
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 28) {
-                Spacer().frame(height: 40)
+            VStack(spacing: isIPad ? 40 : 28) {
+                Spacer().frame(height: isIPad ? 60 : 40)
 
                 Image(systemName: "ear.and.waveform")
-                    .font(.system(size: 68, weight: .semibold))
+                    .font(.system(size: isIPad ? 100 : 68, weight: .semibold))
                     .foregroundStyle(.cyan)
                     .shadow(color: .cyan.opacity(0.7), radius: 24)
 
-                VStack(spacing: 10) {
+                VStack(spacing: isIPad ? 16 : 10) {
                     Text("みみ年齢")
-                        .font(.system(size: 40, weight: .black, design: .rounded))
+                        .font(.system(size: isIPad ? 56 : 40, weight: .black, design: .rounded))
                     Text("高い音がどこまで聞こえるかを測って、耳の目安年齢をチェックします。")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: isIPad ? 20 : 16, weight: .medium))
                         .foregroundStyle(.white.opacity(0.72))
                         .multilineTextAlignment(.center)
                         .lineSpacing(5)
@@ -77,54 +80,67 @@ private struct HomeView: View {
                 .padding(.horizontal, 32)
 
                 GlassPanel {
-                    VStack(spacing: 14) {
-                        InfoPill(icon: "headphones", text: "イヤホン推奨")
-                        InfoPill(icon: "speaker.wave.2", text: "音量は中くらい")
-                        InfoPill(icon: "moon.zzz", text: "静かな場所で測定")
+                    VStack(spacing: isIPad ? 22 : 14) {
+                        InfoPill(icon: "headphones", text: "イヤホン推奨", isIPad: isIPad)
+                        InfoPill(icon: "speaker.wave.2", text: "音量は中くらい", isIPad: isIPad)
+                        InfoPill(icon: "moon.zzz", text: "静かな場所で測定", isIPad: isIPad)
                     }
                 }
 
                 BigButton(title: "テストを始める", icon: "play.fill", action: onStart)
-                    .padding(.bottom, 40)
+                    .padding(.bottom, isIPad ? 60 : 40)
             }
+            .frame(maxWidth: isIPad ? 600 : .infinity)
+            .frame(maxWidth: .infinity)
         }
         .scrollBounceBehavior(.basedOnSize)
     }
 }
 
 private struct PrepareView: View {
+    @Environment(\.horizontalSizeClass) private var hSizeClass
     let onReady: () -> Void
 
+    private var isIPad: Bool { hSizeClass == .regular }
+
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            SectionTitle(icon: "headphones.circle.fill", title: "準備")
+        ScrollView {
+            VStack(spacing: isIPad ? 36 : 24) {
+                Spacer().frame(height: isIPad ? 80 : 40)
+                SectionTitle(icon: "headphones.circle.fill", title: "準備", isIPad: isIPad)
 
-            GlassPanel {
-                VStack(alignment: .leading, spacing: 18) {
-                    PrepareRow(num: "1", text: "イヤホンかヘッドホンを装着")
-                    PrepareRow(num: "2", text: "音量を中くらいに設定")
-                    PrepareRow(num: "3", text: "音が聞こえたらチェック")
+                GlassPanel {
+                    VStack(alignment: .leading, spacing: isIPad ? 28 : 18) {
+                        PrepareRow(num: "1", text: "イヤホンかヘッドホンを装着", isIPad: isIPad)
+                        PrepareRow(num: "2", text: "音量を中くらいに設定", isIPad: isIPad)
+                        PrepareRow(num: "3", text: "音が聞こえたらチェック", isIPad: isIPad)
+                    }
                 }
-            }
 
-            Spacer()
-            BigButton(title: "準備できた", icon: "checkmark", action: onReady)
-                .padding(.bottom, 40)
+                Spacer().frame(height: isIPad ? 40 : 20)
+                BigButton(title: "準備できた", icon: "checkmark", action: onReady)
+                    .padding(.bottom, isIPad ? 60 : 40)
+            }
+            .frame(maxWidth: isIPad ? 600 : .infinity)
+            .frame(maxWidth: .infinity)
         }
+        .scrollBounceBehavior(.basedOnSize)
     }
 }
 
 private struct TestView: View {
+    @Environment(\.horizontalSizeClass) private var hSizeClass
     @Bindable var test: HearingTest
     @Bindable var sound: SoundGenerator
     let onFinish: () -> Void
 
+    private var isIPad: Bool { hSizeClass == .regular }
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                SectionTitle(icon: "waveform", title: "テスト中")
-                    .padding(.top, 28)
+            VStack(spacing: isIPad ? 36 : 24) {
+                SectionTitle(icon: "waveform", title: "テスト中", isIPad: isIPad)
+                    .padding(.top, isIPad ? 48 : 28)
 
                 ProgressView(value: test.progress)
                     .tint(.cyan)
@@ -132,22 +148,22 @@ private struct TestView: View {
                     .padding(.horizontal, 32)
 
                 Text("\(test.currentIndex + 1) / \(test.steps.count)")
-                    .font(.system(size: 15, weight: .bold, design: .monospaced))
+                    .font(.system(size: isIPad ? 18 : 15, weight: .bold, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.64))
 
                 if let step = test.currentStep {
                     GlassPanel {
-                        VStack(spacing: 18) {
+                        VStack(spacing: isIPad ? 28 : 18) {
                             Text(step.label)
-                                .font(.system(size: 42, weight: .black, design: .monospaced))
+                                .font(.system(size: isIPad ? 58 : 42, weight: .black, design: .monospaced))
                                 .foregroundStyle(.cyan)
 
                             Button {
                                 sound.play(frequency: step.frequency, duration: 2.5)
                             } label: {
                                 Label(sound.isPlaying ? "再生中..." : "音を鳴らす", systemImage: sound.isPlaying ? "speaker.wave.3.fill" : "speaker.fill")
-                                    .font(.system(size: 20, weight: .bold))
-                                    .frame(maxWidth: .infinity, minHeight: 54)
+                                    .font(.system(size: isIPad ? 26 : 20, weight: .bold))
+                                    .frame(maxWidth: .infinity, minHeight: isIPad ? 70 : 54)
                                     .background(sound.isPlaying ? Color.orange : Color.cyan, in: RoundedRectangle(cornerRadius: 16))
                                     .foregroundStyle(.black)
                             }
@@ -155,22 +171,24 @@ private struct TestView: View {
                     }
 
                     Text("音は聞こえましたか？")
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: isIPad ? 26 : 20, weight: .bold))
                         .foregroundStyle(.white)
 
-                    HStack(spacing: 14) {
-                        AnswerButton(title: "聞こえた", icon: "checkmark.circle.fill", color: .green) {
+                    HStack(spacing: isIPad ? 24 : 14) {
+                        AnswerButton(title: "聞こえた", icon: "checkmark.circle.fill", color: .green, isIPad: isIPad) {
                             answer(true)
                         }
-                        AnswerButton(title: "聞こえない", icon: "xmark.circle.fill", color: .red) {
+                        AnswerButton(title: "聞こえない", icon: "xmark.circle.fill", color: .red, isIPad: isIPad) {
                             answer(false)
                         }
                     }
                     .padding(.horizontal, 22)
                 }
 
-                Spacer().frame(height: 40)
+                Spacer().frame(height: isIPad ? 60 : 40)
             }
+            .frame(maxWidth: isIPad ? 600 : .infinity)
+            .frame(maxWidth: .infinity)
         }
         .scrollBounceBehavior(.basedOnSize)
     }
@@ -183,59 +201,65 @@ private struct TestView: View {
 }
 
 private struct ResultView: View {
+    @Environment(\.horizontalSizeClass) private var hSizeClass
     let test: HearingTest
     let onRetry: () -> Void
 
+    private var isIPad: Bool { hSizeClass == .regular }
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 22) {
-                SectionTitle(icon: "sparkles", title: "結果")
-                    .padding(.top, 24)
+            VStack(spacing: isIPad ? 32 : 22) {
+                SectionTitle(icon: "sparkles", title: "結果", isIPad: isIPad)
+                    .padding(.top, isIPad ? 48 : 24)
 
+                let circleSize: CGFloat = isIPad ? 300 : 210
+                let strokeWidth: CGFloat = isIPad ? 18 : 14
                 ZStack {
                     Circle()
-                        .stroke(.white.opacity(0.12), lineWidth: 14)
+                        .stroke(.white.opacity(0.12), lineWidth: strokeWidth)
                     Circle()
                         .trim(from: 0, to: min(1, Double(80 - test.earAge) / 80))
-                        .stroke(.cyan, style: StrokeStyle(lineWidth: 14, lineCap: .round))
+                        .stroke(.cyan, style: StrokeStyle(lineWidth: strokeWidth, lineCap: .round))
                         .rotationEffect(.degrees(-90))
-                    VStack(spacing: 4) {
+                    VStack(spacing: isIPad ? 8 : 4) {
                         Text("みみ年齢")
-                            .font(.system(size: 16, weight: .bold))
+                            .font(.system(size: isIPad ? 22 : 16, weight: .bold))
                             .foregroundStyle(.white.opacity(0.6))
                         Text("\(test.earAge)")
-                            .font(.system(size: 68, weight: .black, design: .rounded))
+                            .font(.system(size: isIPad ? 96 : 68, weight: .black, design: .rounded))
                             .foregroundStyle(.cyan)
                         Text("歳")
-                            .font(.system(size: 20, weight: .bold))
+                            .font(.system(size: isIPad ? 28 : 20, weight: .bold))
                             .foregroundStyle(.white.opacity(0.7))
                     }
                 }
-                .frame(width: 210, height: 210)
+                .frame(width: circleSize, height: circleSize)
 
                 Text(test.ageComment)
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: isIPad ? 22 : 18, weight: .medium))
                     .foregroundStyle(.white.opacity(0.82))
                     .multilineTextAlignment(.center)
                     .lineSpacing(5)
                     .padding(.horizontal, 28)
 
                 GlassPanel {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: isIPad ? 18 : 12) {
                         Text("テスト詳細")
-                            .font(.system(size: 17, weight: .black))
+                            .font(.system(size: isIPad ? 20 : 17, weight: .black))
                             .foregroundStyle(.white.opacity(0.7))
                         ForEach(Array(test.steps.enumerated()), id: \.element.id) { index, step in
                             HStack {
                                 Text(step.label)
-                                    .font(.system(size: 16, weight: .semibold, design: .monospaced))
+                                    .font(.system(size: isIPad ? 19 : 16, weight: .semibold, design: .monospaced))
                                 Spacer()
                                 Text(step.ageRange)
-                                    .font(.system(size: 14, weight: .medium))
+                                    .font(.system(size: isIPad ? 17 : 14, weight: .medium))
                                     .foregroundStyle(.white.opacity(0.55))
                                 if index < test.results.count {
                                     Image(systemName: test.results[index] ? "checkmark.circle.fill" : "xmark.circle.fill")
                                         .foregroundStyle(test.results[index] ? .green : .red)
+                                        .font(.system(size: isIPad ? 22 : 17))
                                 }
                             }
                             .foregroundStyle(.white)
@@ -244,8 +268,10 @@ private struct ResultView: View {
                 }
 
                 BigButton(title: "もう一度テスト", icon: "arrow.counterclockwise", action: onRetry)
-                    .padding(.bottom, 36)
+                    .padding(.bottom, isIPad ? 60 : 36)
             }
+            .frame(maxWidth: isIPad ? 600 : .infinity)
+            .frame(maxWidth: .infinity)
         }
     }
 }
@@ -280,10 +306,11 @@ private struct GlassPanel<Content: View>: View {
 private struct SectionTitle: View {
     let icon: String
     let title: String
+    var isIPad: Bool = false
 
     var body: some View {
         Label(title, systemImage: icon)
-            .font(.system(size: 30, weight: .black, design: .rounded))
+            .font(.system(size: isIPad ? 40 : 30, weight: .black, design: .rounded))
             .foregroundStyle(.white)
     }
 }
@@ -291,14 +318,15 @@ private struct SectionTitle: View {
 private struct InfoPill: View {
     let icon: String
     let text: String
+    var isIPad: Bool = false
 
     var body: some View {
         HStack {
             Image(systemName: icon)
                 .foregroundStyle(.cyan)
-                .frame(width: 28)
+                .frame(width: isIPad ? 36 : 28)
             Text(text)
-                .font(.system(size: 17, weight: .bold))
+                .font(.system(size: isIPad ? 22 : 17, weight: .bold))
             Spacer()
         }
         .foregroundStyle(.white)
@@ -308,16 +336,17 @@ private struct InfoPill: View {
 private struct PrepareRow: View {
     let num: String
     let text: String
+    var isIPad: Bool = false
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: isIPad ? 20 : 14) {
             Text(num)
-                .font(.system(size: 20, weight: .black, design: .rounded))
+                .font(.system(size: isIPad ? 26 : 20, weight: .black, design: .rounded))
                 .foregroundStyle(.black)
-                .frame(width: 38, height: 38)
+                .frame(width: isIPad ? 48 : 38, height: isIPad ? 48 : 38)
                 .background(.cyan, in: Circle())
             Text(text)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(size: isIPad ? 22 : 18, weight: .semibold))
                 .foregroundStyle(.white)
         }
     }
@@ -327,18 +356,19 @@ private struct AnswerButton: View {
     let title: String
     let icon: String
     let color: Color
+    var isIPad: Bool = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            VStack(spacing: isIPad ? 12 : 8) {
                 Image(systemName: icon)
-                    .font(.system(size: 32))
+                    .font(.system(size: isIPad ? 44 : 32))
                 Text(title)
-                    .font(.system(size: 18, weight: .black))
+                    .font(.system(size: isIPad ? 24 : 18, weight: .black))
             }
             .foregroundStyle(.white)
-            .frame(maxWidth: .infinity, minHeight: 96)
+            .frame(maxWidth: .infinity, minHeight: isIPad ? 120 : 96)
             .background(color.opacity(0.82), in: RoundedRectangle(cornerRadius: 20))
         }
     }
