@@ -31,7 +31,7 @@ targets:
       base:
         PRODUCT_NAME: MimiNenrei
         PRODUCT_BUNDLE_IDENTIFIER: com.tokyonasu.miminenrei
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_FILE: MimiNenrei/Resources/Info.plist
     info:

@@ -88,6 +88,12 @@ private struct HomeView: View {
                 }
 
                 BigButton(title: "テストを始める", icon: "play.fill", action: onStart)
+
+                Text("※ 医療機器ではありません。結果は目安です。")
+                    .font(.system(size: isIPad ? 14 : 12, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.45))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
                     .padding(.bottom, isIPad ? 60 : 40)
             }
             .frame(maxWidth: isIPad ? 600 : .infinity)
@@ -267,11 +273,59 @@ private struct ResultView: View {
                     }
                 }
 
+                GlassPanel {
+                    ReferencesSection(isIPad: isIPad)
+                }
+
                 BigButton(title: "もう一度テスト", icon: "arrow.counterclockwise", action: onRetry)
                     .padding(.bottom, isIPad ? 60 : 36)
             }
             .frame(maxWidth: isIPad ? 600 : .infinity)
             .frame(maxWidth: .infinity)
+        }
+    }
+}
+
+private struct ReferencesSection: View {
+    var isIPad: Bool = false
+
+    private let references: [(title: String, url: String)] = [
+        ("WHO: Deafness and hearing loss", "https://www.who.int/news-room/fact-sheets/detail/deafness-and-hearing-loss"),
+        ("NIH/NIDCD: Age-Related Hearing Loss", "https://www.nidcd.nih.gov/health/age-related-hearing-loss"),
+        ("NIH/NIDCD: Noise-Induced Hearing Loss", "https://www.nidcd.nih.gov/health/noise-induced-hearing-loss"),
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: isIPad ? 16 : 10) {
+            Label("情報元・参考文献", systemImage: "book.closed")
+                .font(.system(size: isIPad ? 20 : 17, weight: .black))
+                .foregroundStyle(.white.opacity(0.7))
+
+            Text("このアプリは医療機器ではありません。結果は聴力の目安であり、医学的な診断ではありません。聴力に不安がある場合は耳鼻咽喉科を受診してください。")
+                .font(.system(size: isIPad ? 15 : 13, weight: .medium))
+                .foregroundStyle(.white.opacity(0.55))
+                .lineSpacing(3)
+
+            Text("周波数と年齢の対応は以下の医学文献に基づきます:")
+                .font(.system(size: isIPad ? 15 : 13, weight: .medium))
+                .foregroundStyle(.white.opacity(0.55))
+
+            ForEach(Array(references.enumerated()), id: \.offset) { _, ref in
+                if let url = URL(string: ref.url) {
+                    Link(destination: url) {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: "link")
+                                .font(.system(size: isIPad ? 14 : 12))
+                                .foregroundStyle(.cyan)
+                                .padding(.top, 2)
+                            Text(ref.title)
+                                .font(.system(size: isIPad ? 15 : 13, weight: .semibold))
+                                .foregroundStyle(.cyan)
+                                .multilineTextAlignment(.leading)
+                        }
+                    }
+                }
+            }
         }
     }
 }
