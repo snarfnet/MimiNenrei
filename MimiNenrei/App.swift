@@ -2,8 +2,21 @@ import SwiftUI
 import AppTrackingTransparency
 import GoogleMobileAds
 
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            DispatchQueue.main.async {
+                MobileAds.shared.start { _ in }
+            }
+        }
+        return true
+    }
+}
+
 @main
 struct MimiNenreiApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @State private var attRequested = false
 
@@ -14,9 +27,6 @@ struct MimiNenreiApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear {
-                    Task { await MobileAds.shared.start() }
-                }
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active && !attRequested && !Self.isScreenshotMode {
                         attRequested = true
