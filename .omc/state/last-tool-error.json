@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"ls C:/Users/Windows/DUB_UNIVERSE/scripts/ 2>/dev/null; echo \\\"---\\\"; ls C:/Users/Windows/CleaningKokoroe/scripts/ 2>/dev/null; echo \\\"---\\\"; ls C:/Users/Windows/CuteSoroban/scripts/ 2>/dev...",
+  "error": "Exit code 2\napp_store_release.js\nasc_metadata.js\ncreate_app_store_signing.js\ncreate_submission_assets.py\n---\n---\nsetup_metadata.py\nsubmit.py\n---\nsubmit.py\nupload_screenshots.py\n---",
+  "timestamp": "2026-06-03T06:16:29.252Z",
+  "retry_count": 1
+}

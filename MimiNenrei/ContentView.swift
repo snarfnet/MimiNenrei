@@ -89,6 +89,10 @@ private struct HomeView: View {
 
                 BigButton(title: "テストを始める", icon: "play.fill", action: onStart)
 
+                GlassPanel {
+                    ReferencesSection(isIPad: isIPad)
+                }
+
                 Text("※ 医療機器ではありません。結果は目安です。")
                     .font(.system(size: isIPad ? 14 : 12, weight: .medium))
                     .foregroundStyle(.white.opacity(0.45))
@@ -248,6 +252,19 @@ private struct ResultView: View {
                     .multilineTextAlignment(.center)
                     .lineSpacing(5)
                     .padding(.horizontal, 28)
+
+                HStack(spacing: 12) {
+                    Link(destination: URL(string: "https://www.who.int/news-room/fact-sheets/detail/deafness-and-hearing-loss")!) {
+                        Label("WHO", systemImage: "link")
+                            .font(.system(size: isIPad ? 15 : 13, weight: .semibold))
+                            .foregroundStyle(.cyan)
+                    }
+                    Link(destination: URL(string: "https://www.nidcd.nih.gov/health/age-related-hearing-loss")!) {
+                        Label("NIH/NIDCD", systemImage: "link")
+                            .font(.system(size: isIPad ? 15 : 13, weight: .semibold))
+                            .foregroundStyle(.cyan)
+                    }
+                }
 
                 GlassPanel {
                     VStack(alignment: .leading, spacing: isIPad ? 18 : 12) {
