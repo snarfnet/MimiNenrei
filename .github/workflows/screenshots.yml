@@ -27,77 +27,70 @@ jobs:
     - name: Generate Xcode project
       run: xcodegen generate
 
+    - name: Find Simulators
+      run: |
+        IPHONE_ID=$(xcrun simctl list devices available | grep "iPhone 16 Pro Max" | head -1 | grep -oE '[A-F0-9-]{36}')
+        if [ -z "$IPHONE_ID" ]; then
+          IPHONE_ID=$(xcrun simctl list devices available | grep "iPhone" | grep "Pro Max" | head -1 | grep -oE '[A-F0-9-]{36}')
+        fi
+        IPAD_ID=$(xcrun simctl list devices available | grep "iPad Pro" | grep "13" | head -1 | grep -oE '[A-F0-9-]{36}')
+        if [ -z "$IPAD_ID" ]; then
+          IPAD_ID=$(xcrun simctl list devices available | grep "iPad Pro" | grep "12.9" | head -1 | grep -oE '[A-F0-9-]{36}')
+        fi
+        if [ -z "$IPAD_ID" ]; then
+          IPAD_ID=$(xcrun simctl list devices available | grep "iPad" | head -1 | grep -oE '[A-F0-9-]{36}')
+        fi
+        echo "IPHONE_ID=$IPHONE_ID" >> $GITHUB_ENV
+        echo "IPAD_ID=$IPAD_ID" >> $GITHUB_ENV
+        echo "iPhone: $IPHONE_ID / iPad: $IPAD_ID"
+
     - name: Build for iPhone Simulator
       run: |
         xcodebuild build \
           -scheme MimiNenrei \
           -configuration Debug \
-          -destination "platform=iOS Simulator,name=iPhone 16 Pro Max" \
+          -destination "id=$IPHONE_ID" \
           -derivedDataPath build/DerivedData \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO \
-          GAD_APPLICATION_IDENTIFIER=ca-app-pub-3940256099942544~1458002511 \
-          GAD_BANNER_AD_UNIT_ID=ca-app-pub-3940256099942544/2934735716
+          CODE_SIGNING_ALLOWED=NO
 
-    - name: Boot iPhone Simulator & Take Screenshots
+    - name: Take iPhone Screenshot
       run: |
-        UDID=$(xcrun simctl list devices available | grep "iPhone 16 Pro Max" | head -1 | grep -E -o '\([A-F0-9-]{36}\)' | tr -d '()')
-        if [ -z "$UDID" ]; then
-          UDID=$(xcrun simctl list devices available | grep "iPhone" | grep "Pro Max" | head -1 | grep -E -o '\([A-F0-9-]{36}\)' | tr -d '()')
-        fi
-        echo "IPHONE_UDID=$UDID" >> $GITHUB_ENV
-        xcrun simctl boot "$UDID" || true
-        xcrun simctl bootstatus "$UDID" -b
+        xcrun simctl boot "$IPHONE_ID" || true
+        xcrun simctl bootstatus "$IPHONE_ID" -b
         APP_PATH=$(find build/DerivedData -name "MimiNenrei.app" -type d | head -1)
         mkdir -p screenshots
-
-        # Result screen (screenshot mode)
-        xcrun simctl install "$UDID" "$APP_PATH"
-        xcrun simctl launch "$UDID" com.tokyonasu.miminenrei SCREENSHOT_MODE
-        sleep 6
-        xcrun simctl io "$UDID" screenshot screenshots/iphone_67.png
-        xcrun simctl terminate "$UDID" com.tokyonasu.miminenrei || true
-        xcrun simctl shutdown "$UDID" || true
+        xcrun simctl install "$IPHONE_ID" "$APP_PATH"
+        xcrun simctl launch "$IPHONE_ID" com.tokyonasu.miminenrei SCREENSHOT_MODE
+        sleep 8
+        xcrun simctl io "$IPHONE_ID" screenshot screenshots/iphone_67.png
+        xcrun simctl shutdown "$IPHONE_ID" || true
 
     - name: Build for iPad Simulator
       run: |
-        IPAD_DEST=$(xcrun simctl list devices available | grep -i "iPad Pro" | grep -i "13" | head -1 | sed 's/(.*//' | xargs)
-        if [ -z "$IPAD_DEST" ]; then
-          IPAD_DEST="iPad Air 13-inch (M2)"
-        fi
-        echo "Building for: $IPAD_DEST"
         xcodebuild build \
           -scheme MimiNenrei \
           -configuration Debug \
-          -destination "platform=iOS Simulator,name=$IPAD_DEST" \
+          -destination "id=$IPAD_ID" \
           -derivedDataPath build/DerivedDataiPad \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO \
-          GAD_APPLICATION_IDENTIFIER=ca-app-pub-3940256099942544~1458002511 \
-          GAD_BANNER_AD_UNIT_ID=ca-app-pub-3940256099942544/2934735716
+          | xcpretty || true
 
-    - name: Boot iPad Simulator & Take Screenshot
+    - name: Take iPad Screenshot
       run: |
-        UDID=$(xcrun simctl list devices available | grep -i "iPad Pro" | grep -i "13" | head -1 | grep -E -o '\([A-F0-9-]{36}\)' | tr -d '()')
-        if [ -z "$UDID" ]; then
-          UDID=$(xcrun simctl list devices available | grep -i "iPad Air" | grep -i "13" | head -1 | grep -E -o '\([A-F0-9-]{36}\)' | tr -d '()')
-        fi
-        if [ -z "$UDID" ]; then
-          UDID=$(xcrun simctl list devices available | grep -i "iPad" | tail -1 | grep -E -o '\([A-F0-9-]{36}\)' | tr -d '()')
-        fi
-        echo "IPAD_UDID=$UDID"
-        xcrun simctl boot "$UDID" || true
-        xcrun simctl bootstatus "$UDID" -b
+        xcrun simctl boot "$IPAD_ID" || true
+        xcrun simctl bootstatus "$IPAD_ID" -b
         APP_PATH=$(find build/DerivedDataiPad -name "MimiNenrei.app" -type d | head -1)
         if [ -z "$APP_PATH" ]; then
           APP_PATH=$(find build/DerivedData -name "MimiNenrei.app" -type d | head -1)
         fi
-        xcrun simctl install "$UDID" "$APP_PATH"
-        xcrun simctl launch "$UDID" com.tokyonasu.miminenrei SCREENSHOT_MODE
-        sleep 6
-        xcrun simctl io "$UDID" screenshot screenshots/ipad_129.png
+        xcrun simctl install "$IPAD_ID" "$APP_PATH"
+        xcrun simctl launch "$IPAD_ID" com.tokyonasu.miminenrei SCREENSHOT_MODE
+        sleep 8
+        xcrun simctl io "$IPAD_ID" screenshot screenshots/ipad_129.png
 
     - name: Upload screenshots artifact
       uses: actions/upload-artifact@v4
