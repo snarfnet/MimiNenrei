@@ -79,6 +79,20 @@ private struct HomeView: View {
                 .foregroundStyle(.white)
                 .padding(.horizontal, 32)
 
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundStyle(.cyan)
+                        .font(.system(size: isIPad ? 14 : 12))
+                    Text("WHO・NIH/NIDCD 医学文献に基づく")
+                        .font(.system(size: isIPad ? 14 : 12, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(.white.opacity(0.1))
+                .clipShape(Capsule())
+                .overlay(Capsule().stroke(Color.cyan.opacity(0.4), lineWidth: 1))
+
                 GlassPanel {
                     VStack(spacing: isIPad ? 22 : 14) {
                         InfoPill(icon: "headphones", text: "イヤホン推奨", isIPad: isIPad)
