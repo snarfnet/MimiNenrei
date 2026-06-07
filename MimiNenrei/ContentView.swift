@@ -267,19 +267,6 @@ private struct ResultView: View {
                     .lineSpacing(5)
                     .padding(.horizontal, 28)
 
-                HStack(spacing: 12) {
-                    Link(destination: URL(string: "https://www.who.int/news-room/fact-sheets/detail/deafness-and-hearing-loss")!) {
-                        Label("WHO", systemImage: "link")
-                            .font(.system(size: isIPad ? 15 : 13, weight: .semibold))
-                            .foregroundStyle(.cyan)
-                    }
-                    Link(destination: URL(string: "https://www.nidcd.nih.gov/health/age-related-hearing-loss")!) {
-                        Label("NIH/NIDCD", systemImage: "link")
-                            .font(.system(size: isIPad ? 15 : 13, weight: .semibold))
-                            .foregroundStyle(.cyan)
-                    }
-                }
-
                 GlassPanel {
                     VStack(alignment: .leading, spacing: isIPad ? 18 : 12) {
                         Text("テスト詳細")
@@ -320,39 +307,56 @@ private struct ResultView: View {
 private struct ReferencesSection: View {
     var isIPad: Bool = false
 
-    private let references: [(title: String, url: String)] = [
-        ("WHO: Deafness and hearing loss", "https://www.who.int/news-room/fact-sheets/detail/deafness-and-hearing-loss"),
-        ("NIH/NIDCD: Age-Related Hearing Loss", "https://www.nidcd.nih.gov/health/age-related-hearing-loss"),
-        ("NIH/NIDCD: Noise-Induced Hearing Loss", "https://www.nidcd.nih.gov/health/noise-induced-hearing-loss"),
+    private let references: [(title: String, detail: String, url: String)] = [
+        ("WHO: Deafness and hearing loss (2024)",
+         "加齢に伴う高周波数帯域の聴力低下に関する疫学データ。85dB以上の騒音回避を推奨。",
+         "https://www.who.int/news-room/fact-sheets/detail/deafness-and-hearing-loss"),
+        ("NIH/NIDCD: Age-Related Hearing Loss (Presbycusis)",
+         "加齢性難聴（老人性難聴）の進行パターン。高周波数から低下が始まる。",
+         "https://www.nidcd.nih.gov/health/age-related-hearing-loss"),
+        ("NIH/NIDCD: Noise-Induced Hearing Loss",
+         "騒音性難聴の予防。長時間の大音量曝露が聴力低下の主因。",
+         "https://www.nidcd.nih.gov/health/noise-induced-hearing-loss"),
+        ("ISO 7029:2017 Acoustics",
+         "年齢別の聴力閾値の統計的分布。本アプリの周波数-年齢対応表の基礎データ。",
+         "https://www.iso.org/standard/42916.html"),
     ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: isIPad ? 16 : 10) {
-            Label("情報元・参考文献", systemImage: "book.closed")
+            Label("医学的根拠・参考文献", systemImage: "book.closed.fill")
                 .font(.system(size: isIPad ? 20 : 17, weight: .black))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.cyan)
 
-            Text("このアプリは医療機器ではありません。結果は聴力の目安であり、医学的な診断ではありません。聴力に不安がある場合は耳鼻咽喉科を受診してください。")
-                .font(.system(size: isIPad ? 15 : 13, weight: .medium))
-                .foregroundStyle(.white.opacity(0.55))
+            Text("⚠️ このアプリは医療機器ではありません。結果は聴力の目安であり、医学的な診断ではありません。聴力に不安がある場合は耳鼻咽喉科を受診してください。")
+                .font(.system(size: isIPad ? 15 : 13, weight: .bold))
+                .foregroundStyle(.white.opacity(0.7))
                 .lineSpacing(3)
 
-            Text("周波数と年齢の対応は以下の医学文献に基づきます:")
-                .font(.system(size: isIPad ? 15 : 13, weight: .medium))
-                .foregroundStyle(.white.opacity(0.55))
+            Divider().overlay(Color.white.opacity(0.2))
+
+            Text("周波数と耳年齢の対応は、以下の医学文献・国際規格に基づいています:")
+                .font(.system(size: isIPad ? 15 : 13, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.65))
 
             ForEach(Array(references.enumerated()), id: \.offset) { _, ref in
                 if let url = URL(string: ref.url) {
                     Link(destination: url) {
-                        HStack(alignment: .top, spacing: 8) {
-                            Image(systemName: "link")
-                                .font(.system(size: isIPad ? 14 : 12))
-                                .foregroundStyle(.cyan)
-                                .padding(.top, 2)
-                            Text(ref.title)
-                                .font(.system(size: isIPad ? 15 : 13, weight: .semibold))
-                                .foregroundStyle(.cyan)
-                                .multilineTextAlignment(.leading)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: "link.circle.fill")
+                                    .font(.system(size: isIPad ? 18 : 15))
+                                    .foregroundStyle(.cyan)
+                                    .padding(.top, 1)
+                                Text(ref.title)
+                                    .font(.system(size: isIPad ? 15 : 13, weight: .bold))
+                                    .foregroundStyle(.cyan)
+                                    .multilineTextAlignment(.leading)
+                            }
+                            Text(ref.detail)
+                                .font(.system(size: isIPad ? 13 : 11, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.5))
+                                .padding(.leading, isIPad ? 26 : 23)
                         }
                     }
                 }
