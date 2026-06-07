@@ -47,6 +47,11 @@ targets:
           UIColorName: ""
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         UIUserInterfaceStyle: Light
         GADApplicationIdentifier: "ca-app-pub-9404799280370656~1401685923"
         NSUserTrackingUsageDescription: "広告の最適化のため、トラッキングの許可をお願いします。"
